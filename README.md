@@ -180,3 +180,6 @@ Place in solution root (`.mcp.json`):
 - Containerize the MCP server for deployment.
 
 ---
+
+
+![MCP Server with ArcGIS Pro Add-In](MCPServer_ArcGISAddIn.gif)
