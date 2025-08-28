@@ -30,7 +30,7 @@ namespace APBridgeAddIn
 
             _service = new ProBridgeService("ArcGisProBridgePipe");
             _service.Start();
-            MessageBox.Show("Hello, ArcGIS Pro Add-in!");
+            MessageBox.Show("Hello, I start ArcGisProBridgePipe!");
         }
     }
 }
