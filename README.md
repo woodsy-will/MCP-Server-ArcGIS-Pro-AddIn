@@ -8,7 +8,7 @@ This repository demonstrates how to integrate a **Model Context Protocol (MCP) s
 - **ArcGIS Pro Add-In** (C# with ArcGIS Pro SDK): runs *in-process* with ArcGIS Pro and exposes GIS operations through a local IPC channel (Named Pipes).
 - **MCP Server** (.NET 8 console app): defines MCP tools, communicates with the Add-In via Named Pipes, and is configured as an MCP server in Visual Studio through `.mcp.json`.
 
-This allows Copilot (Agent Mode) to query maps, list layers, count features, zoom to layers, and more — directly in ArcGIS Pro.
+This can allow Copilot (Agent Mode) to query maps, list layers, count features, zoom to layers, and more — directly in ArcGIS Pro.
 
 ---
 
@@ -31,7 +31,6 @@ ArcGisProMcpSample/
 +- ArcGisMcpServer/                # MCP server project (.NET 8)
 ¦  +- Program.cs
 ¦  +- Tools/ProTools.cs            # MCP tool definitions (bridge client)
-¦  +- Tools/HealthTools.cs         # health.ping tool for testing
 ¦  +- Ipc/BridgeClient.cs          # Named Pipe client
 ¦  +- Ipc/IpcModels.cs             # Shared IPC DTOs
 +- .mcp.json                       # MCP server manifest for VS Copilot
@@ -46,7 +45,7 @@ The Add-In starts a **Named Pipe server** on ArcGIS Pro launch. It handles opera
 - `pro.countFeatures`
 - `pro.zoomToLayer`
 
-### Example: `Module.cs`
+### Example: `Module.cs` (in sample is in a button)
 ```csharp
 protected override bool Initialize()
 {
@@ -121,17 +120,6 @@ public static class ProTools
     }
 }
 ```
-
-### Health check tool
-```csharp
-[McpServerToolType]
-public static class HealthTools
-{
-    [McpServerTool(Title = "Ping", Name = "health.ping")]
-    public static object Ping() => new { ok = true, ts = DateTimeOffset.UtcNow };
-}
-```
-
 ---
 
 ## `.mcp.json` Manifest
@@ -145,7 +133,7 @@ Place in solution root (`.mcp.json`):
       "args": [
         "run",
         "--project",
-        "ArcGisMcpServer/ArcGisMcpServer.csproj"
+        "McpServer/ArcGisMcpServer/ArcGisMcpServer.csproj"
       ]
     }
   }
@@ -156,29 +144,21 @@ Place in solution root (`.mcp.json`):
 ## Running in Visual Studio
 1. Open the solution in **Visual Studio 2022 (=17.14)**.
 2. Ensure ArcGIS Pro is running with the Add-In loaded (so the Named Pipe exists).
-3. In VS, open **Copilot Chat ? Agent Mode**.
+3. In VS, open **Copilot Chat Agent Mode**.
 4. Copilot reads `.mcp.json` and starts the MCP server.
 5. Type in chat:
-   - `health.ping` ? returns `{ ok: true, ts: ... }`
    - `pro.listLayers` ? returns the layers in the active map
    - `pro.countFeatures layer=Buildings` ? returns the feature count
 
 ---
 
-## Best Practices
-- Always wrap ArcGIS Pro API calls in **`QueuedTask.Run`**.
-- Never use `.Result` or `.Wait()` on async tasks (causes deadlocks).
-- Send logs to **`Console.Error`** (leave `Console.Out` for MCP protocol messages only).
-- Keep tools small and composable (`pro.*`, `data.*`, `gp.*`).
 
----
 
 ## Next Steps
 - Extend tools with operations like `pro.selectByAttribute`, `pro.getCurrentExtent`, `pro.exportLayer`.
 - Add retry/timeout logic for IPC communication.
-- Package the Add-In as VSIX for easier distribution.
 - Containerize the MCP server for deployment.
-
+...
 ---
 
 
