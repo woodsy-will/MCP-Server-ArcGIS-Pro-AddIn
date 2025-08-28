@@ -12,4 +12,6 @@
     <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.2" />
   </ItemGroup>
 
+  <!-- Show repository root mcp.json in Solution Explorer -->
+
 </Project>

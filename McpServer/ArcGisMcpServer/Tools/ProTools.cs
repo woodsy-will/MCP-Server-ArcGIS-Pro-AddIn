@@ -55,7 +55,7 @@ namespace ArcGisMcpServer.Tools
         public static Task<string> Ping()
         {
             // Non usare il bridge IPC: questo ping verifica solo che il server MCP sia attivo.
-            return Task.FromResult($"pong @ {DateTimeOffset.UtcNow:O}");
+            return Task.FromResult($"pong {DateTimeOffset.UtcNow:O}");
         }
 
         [McpServerTool, Description("MCP echo test")]
