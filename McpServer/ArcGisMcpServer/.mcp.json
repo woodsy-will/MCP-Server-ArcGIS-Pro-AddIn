@@ -1,0 +1,15 @@
+{
+  "inputs": [],
+  "servers": {
+    "arcgis": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "./ArcGisMcpServer.csproj"
+      ],
+      "env": {}
+    }
+  }
+}
