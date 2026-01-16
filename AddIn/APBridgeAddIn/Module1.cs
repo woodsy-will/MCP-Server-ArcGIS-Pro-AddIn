@@ -24,11 +24,24 @@ namespace APBridgeAddIn
     internal class Module1 : Module
     {
         private static Module1 _this = null;
+        private ProBridgeService _service;
 
         /// <summary>
         /// Retrieve the singleton instance to this module here
         /// </summary>
         public static Module1 Current => _this ??= (Module1)FrameworkApplication.FindModule("APBridgeAddIn_Module");
+
+        /// <summary>
+        /// Start the Named Pipe bridge service
+        /// </summary>
+        public void StartBridgeService()
+        {
+            if (_service == null)
+            {
+                _service = new ProBridgeService("ArcGisProBridgePipe");
+                _service.Start();
+            }
+        }
 
         #region Overrides
         /// <summary>
@@ -37,8 +50,7 @@ namespace APBridgeAddIn
         /// <returns>False to prevent Pro from closing, otherwise True</returns>
         protected override bool CanUnload()
         {
-            //TODO - add your business logic
-            //return false to ~cancel~ Application close
+            _service?.Dispose();
             return true;
         }
 

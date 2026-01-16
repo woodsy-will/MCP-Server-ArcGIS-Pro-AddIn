@@ -20,7 +20,19 @@ namespace APBridgeAddIn
         public void Start()
         {
             _cts = new CancellationTokenSource();
-            _serverLoop = Task.Run(() => RunAsync(_cts.Token));
+            _serverLoop = Task.Run(async () =>
+            {
+                try
+                {
+                    await RunAsync(_cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show(
+                        $"Bridge service error: {ex.Message}\n\n{ex.StackTrace}",
+                        "Bridge Service Error");
+                }
+            });
         }
         public void Dispose()
         {
@@ -33,6 +45,8 @@ namespace APBridgeAddIn
                 using var server = new NamedPipeServerStream(_pipeName,
                 PipeDirection.InOut, 1, PipeTransmissionMode.Message,
                 PipeOptions.Asynchronous);
+
+                // Pipe is now created and waiting for connections
                 await server.WaitForConnectionAsync(ct);
                 using var reader = new StreamReader(server, Encoding.UTF8,
                 leaveOpen: true);
