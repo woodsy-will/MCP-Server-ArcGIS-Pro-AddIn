@@ -1,3 +1,5 @@
+
+![[Recording 20260116214114.m4a]]
 # MCP Server ArcGIS Pro Add-In - Technical Architecture
 
 ## System Overview
