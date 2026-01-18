@@ -51,6 +51,18 @@ namespace ArcGisMcpServer.Tools
             return true;
         }
 
+        [McpServerTool, Description("Select features in a layer by SQL where clause")]
+        public static async Task<bool> SelectByAttribute(string layer, string where)
+        {
+            var r = await _client!.OpAsync("pro.selectByAttribute", new()
+            {
+                ["layer"] = layer,
+                ["where"] = where
+            });
+            if (!r.Ok) throw new Exception(r.Error);
+            return true;
+        }
+
         [McpServerTool, Description("Ping test to validate the MCP server (without depending on ArcGIS Pro)")]
         public static Task<string> Ping()
         {
