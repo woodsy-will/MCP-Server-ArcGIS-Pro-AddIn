@@ -24,12 +24,14 @@ namespace APBridgeAddIn
             {
                 try
                 {
+                    Logger.Info($"Bridge service starting on pipe: {_pipeName}");
                     await RunAsync(_cts.Token);
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error("Bridge service error", ex);
                     ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show(
-                        $"Bridge service error: {ex.Message}\n\n{ex.StackTrace}",
+                        $"Bridge service error: {ex.Message}\n\nCheck logs at: {Logger.GetLogPath()}",
                         "Bridge Service Error");
                 }
             });
@@ -48,6 +50,7 @@ namespace APBridgeAddIn
 
                 // Pipe is now created and waiting for connections
                 await server.WaitForConnectionAsync(ct);
+                Logger.Info("Client connected to bridge pipe");
                 using var reader = new StreamReader(server, Encoding.UTF8,
                 leaveOpen: true);
                 using var writer = new StreamWriter(server, new
@@ -72,11 +75,14 @@ namespace APBridgeAddIn
                     }
                     try
                     {
+                        Logger.Info($"Handling operation: {req.Op}");
                         var resp = await HandleAsync(req, ct);
                         await SendAsync(writer, resp);
+                        Logger.Info($"Operation completed: {req.Op} (success: {resp.Ok})");
                     }
                     catch (Exception ex)
                     {
+                        Logger.Error($"Operation failed: {req.Op}", ex);
                         await SendAsync(writer, new IpcResponse(false,
                         ex.Message, null));
                     }

@@ -26,12 +26,14 @@ namespace APBridgeAddIn
         {
             try
             {
+                Logger.Info("Manual bridge service start requested via button");
                 Module1.Current.StartBridgeService();
-                MessageBox.Show("Bridge service started!\n\nNamed Pipe: ArcGisProBridgePipe\n\nThe MCP server can now connect.", "Success");
+                MessageBox.Show($"Bridge service started!\n\nNamed Pipe: ArcGisProBridgePipe\n\nThe MCP server can now connect.\n\nLogs: {Logger.GetLogPath()}", "Success");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to start bridge service:\n\n{ex.Message}\n\n{ex.StackTrace}", "Error");
+                Logger.Error("Manual bridge service start failed", ex);
+                MessageBox.Show($"Failed to start bridge service:\n\n{ex.Message}\n\nCheck logs at: {Logger.GetLogPath()}", "Error");
             }
         }
     }
