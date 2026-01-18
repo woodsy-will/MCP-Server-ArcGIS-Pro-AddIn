@@ -65,8 +65,8 @@ def test_named_pipe():
         print(f"✗ Failed to connect to Named Pipe: {e}")
         print("\nMake sure:")
         print("  1. ArcGIS Pro is running")
-        print("  2. You clicked 'Start server mcp' button")
-        print("  3. The bridge service started successfully")
+        print("  2. The bridge service auto-started (or click 'Start server mcp' button)")
+        print("  3. Check logs at: %LocalAppData%\\APBridgeAddIn\\Logs\\")
         return False
     except Exception as e:
         print(f"✗ Unexpected error: {e}")
@@ -88,7 +88,14 @@ def test_via_dotnet():
     print("Testing MCP Server (which will test the bridge)")
     print("="*60)
 
-    project_path = r"C:\Users\wsteinley\AAA_CODE_ROOT_FOLDERS\Custom_Tools\Cloned_repos_from_github\MCP-Server-ArcGIS-Pro-AddIn\McpServer\ArcGisMcpServer\ArcGisMcpServer.csproj"
+    # Find project path dynamically relative to this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_path = os.path.join(script_dir, "McpServer", "ArcGisMcpServer", "ArcGisMcpServer.csproj")
+
+    if not os.path.exists(project_path):
+        print(f"✗ Project file not found at: {project_path}")
+        print("  Please run this script from the repository root")
+        return False
 
     # Create a test input
     test_request = '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"Ping"}}\n'
