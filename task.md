@@ -1,0 +1,10 @@
+- [ ] Deploy Hexagents Configuration <!-- id: 0 -->
+    - [x] Analyze Repository <!-- id: 1 -->
+    - [ ] Create SPEC.md <!-- id: 2 -->
+    - [ ] Initialize AGENTS.md <!-- id: 3 -->
+- [ ] Complete MCP Server <!-- id: 4 -->
+    - [ ] Implement Missing Tools (from TODO) <!-- id: 5 -->
+    - [ ] Fix IPC Bridge Stability <!-- id: 6 -->
+- [ ] Verification <!-- id: 7 -->
+    - [ ] Run Test Suite <!-- id: 8 -->
+    - [ ] Generate Testing Report <!-- id: 9 -->
