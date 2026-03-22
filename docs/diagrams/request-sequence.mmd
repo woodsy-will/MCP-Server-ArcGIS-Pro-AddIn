@@ -1,0 +1,38 @@
+%% Request Sequence - CountFeatures example
+%% Render with: https://mermaid.live or VS Code Mermaid extension
+
+sequenceDiagram
+    actor User as GIS Analyst
+    participant Client as MCP Client<br/>(Copilot/Claude)
+    participant Server as ArcGisMcpServer<br/>(Program.cs)
+    participant Tools as ProTools<br/>[McpServerToolType]
+    participant Bridge as BridgeClient
+    participant Pipe as Named Pipe<br/>ArcGisProBridgePipe
+    participant Service as ProBridgeService<br/>(HandleAsync)
+    participant SDK as ArcGIS Pro SDK<br/>(QueuedTask)
+
+    User->>Client: "Count features in Buildings"
+    Client->>Server: JSON-RPC: tools/call<br/>{ name: "CountFeatures",<br/>  args: { layer: "Buildings" } }
+
+    Server->>Tools: CountFeatures("Buildings")
+    Tools->>Bridge: OpAsync("pro.countFeatures",<br/>{ layer: "Buildings" })
+
+    Note over Bridge,Pipe: New connection per request
+    Bridge->>Pipe: ConnectAsync(2000ms)
+    Bridge->>Pipe: WriteLineAsync(JSON)
+
+    Pipe->>Service: ReadLineAsync()
+    Service->>Service: Deserialize IpcRequest
+
+    Service->>SDK: QueuedTask.Run(() =><br/>  FindLayer("Buildings")<br/>  .GetFeatureClass()<br/>  .GetCount())
+    SDK-->>Service: 1523
+
+    Service->>Pipe: WriteLineAsync(<br/>{ ok: true, data: { count: 1523 } })
+
+    Pipe-->>Bridge: ReadLineAsync()
+    Note over Bridge,Pipe: Connection disposed
+
+    Bridge-->>Tools: IpcResponse
+    Tools-->>Server: 1523
+    Server-->>Client: JSON-RPC result: 1523
+    Client-->>User: "Buildings has 1,523 features"

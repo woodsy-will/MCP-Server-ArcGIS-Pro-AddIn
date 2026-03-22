@@ -1,0 +1,59 @@
+%% System Overview - MCP ArcGIS Pro Bridge
+%% Render with: https://mermaid.live or VS Code Mermaid extension
+
+graph TB
+    subgraph "User Layer"
+        USER["GIS Analyst / Developer"]
+    end
+
+    subgraph "AI Agent Layer"
+        COPILOT["GitHub Copilot<br/>(VS 2022 Agent Mode)"]
+        CLAUDE["Claude Desktop<br/>/ Claude Code"]
+    end
+
+    subgraph "MCP Protocol Layer"
+        direction TB
+        MCPJSON["stdio JSON-RPC 2.0"]
+    end
+
+    subgraph "MCP Server Process"
+        direction TB
+        PROG["Program.cs<br/>Host + DI"]
+        TOOLS["ProTools.cs<br/>[McpServerToolType]"]
+        BRIDGE["BridgeClient.cs<br/>Pipe Client"]
+        PROG --> TOOLS --> BRIDGE
+    end
+
+    subgraph "IPC Layer"
+        PIPE[("Named Pipe<br/>ArcGisProBridgePipe<br/>(JSON, newline-delimited)")]
+    end
+
+    subgraph "ArcGIS Pro Process"
+        direction TB
+        BTN["Button1.cs<br/>Start Bridge"]
+        MOD["Module1.cs<br/>Module Singleton"]
+        SVC["ProBridgeService.cs<br/>Pipe Server + Handler"]
+        BTN --> MOD --> SVC
+    end
+
+    subgraph "GIS Runtime"
+        SDK["ArcGIS Pro SDK<br/>MapView, FeatureLayer,<br/>QueuedTask"]
+    end
+
+    USER -->|"Natural Language"| COPILOT
+    USER -->|"Natural Language"| CLAUDE
+    COPILOT -->|"MCP"| MCPJSON
+    CLAUDE -->|"MCP"| MCPJSON
+    MCPJSON --> PROG
+    BRIDGE -->|"Connect per request"| PIPE
+    PIPE --> SVC
+    SVC -->|"QueuedTask.Run()"| SDK
+
+    classDef process fill:#E3F2FD,stroke:#1565C0,color:#1565C0
+    classDef external fill:#FFF3E0,stroke:#E65100,color:#E65100
+    classDef ipc fill:#F3E5F5,stroke:#7B1FA2,color:#7B1FA2
+
+    class PROG,TOOLS,BRIDGE process
+    class BTN,MOD,SVC process
+    class COPILOT,CLAUDE,SDK external
+    class PIPE,MCPJSON ipc
